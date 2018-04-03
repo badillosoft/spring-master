@@ -9,7 +9,7 @@ public class PerdirOrdenTest {
     
     public static void main(String[] args) {
         
-        OrdenData orden = new OrdenData();
+        /*OrdenData orden = new OrdenData();
         orden.setId("X");
         
         ClienteData cliente = new ClienteData();
@@ -37,7 +37,7 @@ public class PerdirOrdenTest {
         
         orden.setCupcakes(cupcakes);
         
-        VendedorService.pedir(orden);
+        VendedorService.pedir(orden);*/
     }
     
 }
