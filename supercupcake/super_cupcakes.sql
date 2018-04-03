@@ -70,8 +70,6 @@ insert into cupcakes (tipo, precio) values ('chocolate', 10.0);
 insert into cupcakes (tipo, precio) values ('fresa', 10.0);
 insert into cupcakes (tipo, precio) values ('vainilla', 10.0);
 
-select * from cupcakes;
-
 insert into clientes (nombre, correo) values ('pepe', 'pepe@gmail.com');
 insert into clientes (nombre, correo) values ('paco', 'paco@hotmail.com');
 
@@ -117,7 +115,7 @@ update ordenes set estatus=4 where id=1;
 
 -- 5. Cliente ajusta cobro
 
-select 
+/*select 
 	orden_cupcakes.id,
 	orden_cupcakes.orden,
 	orden_cupcakes.cupcake,
@@ -128,24 +126,57 @@ select
 from orden_cupcakes
 left join cupcakes
 on orden_cupcakes.cupcake=cupcakes.id
-where orden_cupcakes.orden=1;
+where orden_cupcakes.orden=1;*/
 
-select 
+/*select 
 	sum(orden_cupcakes.multiplicador * cupcakes.precio) as total
 from orden_cupcakes
 left join cupcakes
 on orden_cupcakes.cupcake=cupcakes.id
-where orden_cupcakes.orden=1;
+where orden_cupcakes.orden=1;*/
 
-insert into cobros (total, token_paypal, completado) values (80, 'ABC123', 1);
+insert into cobros (total, token_paypal, completado) values (
+	(select sum(orden_cupcakes.multiplicador * cupcakes.precio) as total from orden_cupcakes left join cupcakes on orden_cupcakes.cupcake=cupcakes.id where orden_cupcakes.orden=1),
+	'ABC123',
+	1
+);
+
+update ordenes set cobro=1 where id=1;
 
 update ordenes set estatus=5 where id=1;
 
+-- 6. Vendedor ajusta pago
 
+insert into pagos (token_paypal, completado) values ('ABC123', 1);
 
+update ordenes set pago=1 where id=1;
 
+update ordenes set estatus=6 where id=1;
 
+-- 7. Vendedor selecciona cocina
 
+/*select id from cocinas order by rand() limit 1;*/
 
+update ordenes set cocina=(select id from cocinas order by rand() limit 1) where id=1;
 
+update ordenes set estatus=7 where id=1;
 
+-- 8. Vendedor envia a cocina
+
+update ordenes set estatus=8 where id=1;
+
+-- 9. Cocina termina cupcakes
+
+update ordenes set estatus=9 where id=1;
+
+-- 10. Cocina envia a vendedor
+
+update ordenes set estatus=10 where id=1;
+
+-- 11. Vendedor envia a cliente
+
+update ordenes set estatus=11 where id=1;
+
+-- 12. Orden cierra
+
+update ordenes set estatus=12 where id=1;
