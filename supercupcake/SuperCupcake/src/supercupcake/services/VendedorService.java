@@ -1,43 +1,52 @@
 package supercupcake.services;
 
-import supercupcake.data.OrdenData;
-import supercupcake.data.PagoData;
-import supercupcake.data.EstatusData;
+import java.sql.SQLException;
+import supercupcake.data.*;
+import supercupcake.repositories.*;
 
 public class VendedorService {
     
-    public static void pedir(OrdenData orden) {
+    public static void pedir(OrdenData orden) throws SQLException {
         // El cliente le pide la orden al vendedor
         
-        EstatusData status = new EstatusData();
-        status.setText("El vendor recibe la orden");
-        orden.setStatus(status);
+        // 1. Asignar un vendedor "ALEATORIO"
+        VendedorData vendedor = VendedorRepository.buscarAleatorio();
+        orden.setVendedor(vendedor);
         
-        ClienteService.cobrar(orden);
+        // 2. Recuperar el estatus adecuado
+        EstatusData estatus = EstatusRepository.buscarPorId(3);
+        orden.setEstatus(estatus);
+        
+        // 3. Tomar la lista de cupcakes y guardar en OrdenCupcakesRepository
+        //OrdenRepository.insertarListaCupcakes(orden);
+        
+        // 4. Actualizar la base de datos
+        OrdenRepository.insertar(orden);
     }
     
-    public static void pagar(OrdenData orden) {
+    public static void pagar(OrdenData orden) throws SQLException {
         // El vendor procesa el pago
         
-        EstatusData status = new EstatusData();
-        status.setText("El vendor procesa el pago");
-        orden.setStatus(status);
-        
+        // 1. Generar los datos del pago
         PagoData pago = new PagoData();
-        pago.setPagado(true);
+        pago.setToken_paypal("ABC123");
+        pago.setCompletado(true);
+        PagoRepository.insertar(pago);
         orden.setPago(pago);
         
-        CocinaService.pedir(orden);
+        EstatusData estatus = EstatusRepository.buscarPorId(6);
+        orden.setEstatus(estatus);
+        
+        OrdenRepository.actualizar(orden);
     }
     
-    public static void entregar(OrdenData orden) {
+    public static void entregar(OrdenData orden) throws SQLException {
         // El vendedor recibe la orden de la cocina
         
-        EstatusData status = new EstatusData();
-        status.setText("El vendor recibe los cupcakes de la cocina");
-        orden.setStatus(status);
+        EstatusData estatus = EstatusRepository.buscarPorId(11);
+        orden.setEstatus(estatus);
         
-        ClienteService.entregar(orden);
+        OrdenRepository.actualizar(orden);
     }
     
 }

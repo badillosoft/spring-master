@@ -7,7 +7,6 @@ public class ClienteData {
     String nombre;
     String correo;
     
-
     public int getId() {
         return id;
     }

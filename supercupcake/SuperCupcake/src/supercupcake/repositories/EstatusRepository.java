@@ -6,7 +6,7 @@ import java.sql.*;
 public class EstatusRepository {
     
     public static void insertar(EstatusData estatus) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO estatuss (descripcion) VALUES (?);");
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO estatus (descripcion) VALUES (?);");
         
         st.setString(1, estatus.getDescripcion());
         
@@ -16,7 +16,7 @@ public class EstatusRepository {
     }
     
     public static void actualizar(EstatusData estatus) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE estatuss SET descripcion=? WHERE id=?;");
+        PreparedStatement st = DBManager.generateQuery("UPDATE estatus SET descripcion=? WHERE id=?;");
         
         st.setString(1, estatus.getDescripcion());
         st.setInt(2, estatus.getId());
@@ -25,7 +25,7 @@ public class EstatusRepository {
     }
     
     public static void eliminar(EstatusData estatus) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("DELETE FROM estatuss WHERE id=?;");
+        PreparedStatement st = DBManager.generateQuery("DELETE FROM estatus WHERE id=?;");
         
         st.setInt(1, estatus.getId());
         
@@ -33,7 +33,7 @@ public class EstatusRepository {
     }
     
     public static EstatusData buscarPorId(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM estatuss WHERE id=?;");
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM estatus WHERE id=?;");
         
         st.setInt(1, id);
         

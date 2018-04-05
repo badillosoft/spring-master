@@ -36,6 +36,29 @@ public class ClienteRepository {
         st.executeUpdate();
     }
     
+    public static ClienteData buscarAleatorio() throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes ORDER BY RAND() LIMIT 1;");
+        
+        
+        ResultSet rs = st.executeQuery();
+        
+        ClienteData cliente = new ClienteData();
+        
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            String nombre = rs.getString("nombre");
+            String correo = rs.getString("correo");
+        
+            cliente.setId(id);
+            cliente.setNombre(nombre);
+            cliente.setCorreo(correo);
+        } else {
+            return null;
+        }
+        
+        return cliente;
+    }
+    
     public static ClienteData buscarPorId(int id) throws SQLException {
         PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE id=?;");
         

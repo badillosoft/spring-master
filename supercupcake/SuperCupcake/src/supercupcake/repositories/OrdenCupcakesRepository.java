@@ -51,10 +51,10 @@ public class OrdenCupcakesRepository {
             int id_cupcake = rs.getInt("cupcake");
             int multiplicador = rs.getInt("multiplicador");
             
-            //OrdenData orden = OrdenRepository.buscarPorId(id_orden);
-            CupcakeData cupcake = CupcakeRepository.buscarPorId(id_orden);
+            OrdenData orden = OrdenRepository.buscarPorId(id_orden);
+            CupcakeData cupcake = CupcakeRepository.buscarPorId(id_cupcake);
             
-            //orden_cupcakes.setOrden(orden);
+            orden_cupcakes.setOrden(orden);
             orden_cupcakes.setCupcake(cupcake);
             orden_cupcakes.setMultiplicador(multiplicador);
         } else {

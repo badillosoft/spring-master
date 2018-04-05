@@ -18,18 +18,24 @@ public class OrdenRepository {
     }
     
     public static void actualizar(OrdenData orden) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE ordenes SET cliente=?, vendedor=?, cocina=?, cobro=?, pago=?. estatus=? WHERE id=?;");
+        PreparedStatement st = DBManager.generateQuery("UPDATE ordenes SET cliente=?, vendedor=?, cocina=?, cobro=?, pago=?, estatus=? WHERE id=?;");
         
         st.setInt(1, orden.getCliente().getId());
         st.setInt(2, orden.getVendedor().getId());
         if (orden.getCocina() != null) {
             st.setInt(3, orden.getCocina().getId());
+        } else {
+            st.setNull(3, java.sql.Types.INTEGER);
         }
         if (orden.getCobro() != null) {
             st.setInt(4, orden.getCobro().getId());
+        } else {
+            st.setNull(4, java.sql.Types.INTEGER);
         }
         if (orden.getPago() != null) {
             st.setInt(5, orden.getPago().getId());
+        } else {
+            st.setNull(5, java.sql.Types.INTEGER);
         }
         st.setInt(6, orden.getEstatus().getId());
         st.setInt(7, orden.getId());
@@ -43,6 +49,21 @@ public class OrdenRepository {
         st.setInt(1, orden.getId());
         
         st.executeUpdate();
+    }
+    
+    public static double calcularTotal(int id) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("select sum(A.multiplicador * B.precio) as total from orden_cupcakes as A left join cupcakes as B on A.cupcake=B.id where A.orden=?;");
+        
+        st.setInt(1, id);
+        
+        ResultSet rs = st.executeQuery();
+        
+        if (rs.next()) {
+            double total = rs.getInt("total");
+            return total;
+        }
+        
+        return -1;
     }
     
     public static OrdenData buscarPorId(int id) throws SQLException {

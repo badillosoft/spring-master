@@ -1,32 +1,35 @@
 package supercupcake.services;
 
-import supercupcake.data.OrdenData;
-import supercupcake.data.EstatusData;
-import supercupcake.data.CobroData;
+import java.sql.SQLException;
+import supercupcake.data.*;
+import supercupcake.repositories.*;
 
 public class ClienteService {
     
-    public static void cobrar(OrdenData orden) {
+    public static void cobrar(OrdenData orden) throws SQLException {
         // Se le solicita cobro al cliente, entonces el cliente le paga al vendedor
+        double total = OrdenRepository.calcularTotal(orden.getId());
         
-        EstatusData status = new EstatusData();
-        status.setText("El cliente acepta el cobro (lo configura)");
-        orden.setStatus(status);
-        
-        // El cliente ajusta los datos de cobro
         CobroData cobro = new CobroData();
-        cobro.setCobrado(true);
+        cobro.setTotal(total);
+        cobro.setToken_paypal("XXX123");
+        cobro.setCompletado(true);
+        CobroRepository.insertar(cobro);
         orden.setCobro(cobro);
         
-        VendedorService.pagar(orden);
+        EstatusData estatus = EstatusRepository.buscarPorId(5);
+        orden.setEstatus(estatus);
+        
+        OrdenRepository.actualizar(orden);
     }
     
-    public static void entregar(OrdenData orden) {
+    public static void entregar(OrdenData orden) throws SQLException {
         // El cliente recibe sus cupcakes
         
-        EstatusData status = new EstatusData();
-        status.setText("El cliente recibe sus cupcakes :)");
-        orden.setStatus(status);
+        EstatusData estatus = EstatusRepository.buscarPorId(12);
+        orden.setEstatus(estatus);
+        
+        OrdenRepository.actualizar(orden);
     }
     
 }

@@ -57,4 +57,26 @@ public class CocinaRepository {
         return cocina;
     }
     
+    public static CocinaData buscarAleatorio() throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM cocinas ORDER BY RAND() LIMIT 1;");
+        
+        ResultSet rs = st.executeQuery();
+        
+        CocinaData cocina = new CocinaData();
+        
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            String nombre = rs.getString("nombre");
+            String direccion = rs.getString("direccion");
+            
+            cocina.setId(id);
+            cocina.setNombre(nombre);
+            cocina.setDireccion(direccion);
+        } else {
+            return null;
+        }
+        
+        return cocina;
+    }
+    
 }

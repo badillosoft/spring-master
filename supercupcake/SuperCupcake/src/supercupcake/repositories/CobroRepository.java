@@ -6,7 +6,7 @@ import java.sql.*;
 public class CobroRepository {
     
     public static void insertar(CobroData cobro) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO cobros (total, token_paypal, completado) VALUES (?, ?);");
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO cobros (total, token_paypal, completado) VALUES (?, ?, ?);");
         
         st.setDouble(1, cobro.getTotal());
         st.setString(2, cobro.getToken_paypal());

@@ -5,6 +5,7 @@ import java.util.List;
 import supercupcake.data.ClienteData;
 import supercupcake.repositories.ClienteRepository;
 import supercupcake.repositories.DBManager;
+import supercupcake.repositories.OrdenRepository;
 
 public class ClienteRepositoryTest {
     
@@ -38,15 +39,18 @@ public class ClienteRepositoryTest {
         System.out.println(cliente.getNombre());
         System.out.println(cliente.getCorreo());*/
         
-        List<ClienteData> clientes = ClienteRepository.buscarPorNombre("%");
+        /*List<ClienteData> clientes = ClienteRepository.buscarPorNombre("%");
         
         for (ClienteData cliente : clientes) {
             System.out.println(cliente.getId());
             System.out.println(cliente.getNombre());
             System.out.println(cliente.getCorreo());
             System.out.println("--------------------------------------");
-        }
+        }*/
         
+        double total = OrdenRepository.calcularTotal(1);
+        
+        System.out.printf("Total: %f\n", total);
     }
     
 }

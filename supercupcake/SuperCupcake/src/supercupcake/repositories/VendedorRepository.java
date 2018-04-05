@@ -57,4 +57,26 @@ public class VendedorRepository {
         return vendedor;
     }
     
+    public static VendedorData buscarAleatorio() throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM vendedores ORDER BY RAND() LIMIT 1;");
+        
+        ResultSet rs = st.executeQuery();
+        
+        VendedorData vendedor = new VendedorData();
+        
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            String nombre = rs.getString("nombre");
+            String correo = rs.getString("correo");
+            
+            vendedor.setId(id);
+            vendedor.setNombre(nombre);
+            vendedor.setCorreo(correo);
+        } else {
+            return null;
+        }
+        
+        return vendedor;
+    }
+    
 }

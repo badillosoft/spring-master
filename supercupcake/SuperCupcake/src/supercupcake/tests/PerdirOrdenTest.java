@@ -1,43 +1,41 @@
 package supercupcake.tests;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 import supercupcake.data.*;
-import supercupcake.services.VendedorService;
+import supercupcake.repositories.*;
+import supercupcake.services.*;
 
 public class PerdirOrdenTest {
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
+        DBManager.connect("jdbc:mysql://localhost/super_cupcakes", "root", "kmmx");
         
-        /*OrdenData orden = new OrdenData();
-        orden.setId("X");
+        System.out.println("-- Buscar un cliente aleatorio");
+        // 1. Cliente aleatorio
+        ClienteData cliente = ClienteRepository.buscarAleatorio();
         
-        ClienteData cliente = new ClienteData();
-        cliente.setId("PEPE");
+        PrintService.print(cliente);
+        System.out.println("-*");
+        
+        System.out.println("-- Crear una nueva orden para el cliente");
+        // 2. Crear una nueva orden
+        OrdenData orden = new OrdenData();
         orden.setCliente(cliente);
         
-        VendedorData vendedor = new VendedorData();
-        vendedor.setId("CARLOS");
-        orden.setVendedor(vendedor);
+        PrintService.print(orden);
+        System.out.println("-*");
         
-        CocinaData cocina = new CocinaData();
-        cocina.setId("CONDESA");
-        orden.setCocina(cocina);
+        System.out.println("-- Cliente pide la orden al Vendedor");
+        // 3. Pedir orden al vendedor
+        VendedorService.pedir(orden);
         
-        CupcakeData cup1 = new CupcakeData();
-        cup1.setTipo("CHOCOLATE");
+        PrintService.print(orden);
+        System.out.println("-*");
         
-        CupcakeData cup2 = new CupcakeData();
-        cup2.setTipo("MENTA");
+        // 4. Cobrar al cliente
+        ClienteService.cobrar(orden);
         
-        List<CupcakeData> cupcakes = new ArrayList();
-        
-        cupcakes.add(cup1);
-        cupcakes.add(cup2);
-        
-        orden.setCupcakes(cupcakes);
-        
-        VendedorService.pedir(orden);*/
+        PrintService.print(orden);
     }
     
 }
