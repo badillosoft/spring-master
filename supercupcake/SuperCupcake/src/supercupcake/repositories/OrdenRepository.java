@@ -16,6 +16,8 @@ public class OrdenRepository {
         int id = DBManager.executeInsert(st);
         
         orden.setId(id);
+        
+        OrdenRepository.insertarListaCupcakes(orden);
     }
     
     public static void insertarListaCupcakes(OrdenData orden) throws SQLException {
