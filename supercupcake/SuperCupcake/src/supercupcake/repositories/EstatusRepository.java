@@ -1,85 +1,56 @@
 package supercupcake.repositories;
 
-import supercupcake.data.ClienteData;
+import supercupcake.data.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ClienteRepository {
+public class EstatusRepository {
     
-    public static void insertar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO clientes (nombre, correo) VALUES (?, ?);");
+    public static void insertar(EstatusData estatus) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO estatuss (descripcion) VALUES (?);");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
+        st.setString(1, estatus.getDescripcion());
         
         int id = DBManager.executeInsert(st);
         
-        cliente.setId(id);
+        estatus.setId(id);
     }
     
-    public static void actualizar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE clientes SET nombre=?, correo=? WHERE id=?;");
+    public static void actualizar(EstatusData estatus) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("UPDATE estatuss SET descripcion=? WHERE id=?;");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
-        st.setInt(3, cliente.getId());
+        st.setString(1, estatus.getDescripcion());
+        st.setInt(2, estatus.getId());
         
         st.executeUpdate();
     }
     
-    public static void eliminar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("DELETE FROM clientes WHERE id=?;");
+    public static void eliminar(EstatusData estatus) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("DELETE FROM estatuss WHERE id=?;");
         
-        st.setInt(1, cliente.getId());
+        st.setInt(1, estatus.getId());
         
         st.executeUpdate();
     }
     
-    public static ClienteData buscarPorId(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE id=?;");
+    public static EstatusData buscarPorId(int id) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM estatuss WHERE id=?;");
         
         st.setInt(1, id);
         
         ResultSet rs = st.executeQuery();
         
-        ClienteData cliente = new ClienteData();
-        cliente.setId(id);
+        EstatusData estatus = new EstatusData();
+        estatus.setId(id);
         
         if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
+            String descripcion = rs.getString("descripcion");
             
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
+            estatus.setDescripcion(descripcion);
+        } else {
+            return null;
         }
         
-        return cliente;
-    }
-    
-    public static List<ClienteData> buscarPorNombre(String like) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE nombre like ?;");
-        
-        st.setString(1, like);
-        
-        ResultSet rs = st.executeQuery();
-        
-        List<ClienteData> clientes = new ArrayList();
-        
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
-            
-            ClienteData cliente = new ClienteData();
-            cliente.setId(id);
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
-            
-            clientes.add(cliente);
-        }
-        
-        return clientes;
+        return estatus;
     }
     
 }

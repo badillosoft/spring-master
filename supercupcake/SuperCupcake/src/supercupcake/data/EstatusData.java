@@ -1,16 +1,24 @@
 package supercupcake.data;
 
-public class StatusData {
+public class EstatusData {
     
-    String text;
+    int id;
+    String descripcion;
 
-    public String getText() {
-        return text;
+    public int getId() {
+        return id;
     }
 
-    public void setText(String text) {
-        this.text = text;
-        System.out.println(this.text);
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
     
 }

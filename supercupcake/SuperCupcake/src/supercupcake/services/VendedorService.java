@@ -2,14 +2,14 @@ package supercupcake.services;
 
 import supercupcake.data.OrdenData;
 import supercupcake.data.PagoData;
-import supercupcake.data.StatusData;
+import supercupcake.data.EstatusData;
 
 public class VendedorService {
     
     public static void pedir(OrdenData orden) {
         // El cliente le pide la orden al vendedor
         
-        StatusData status = new StatusData();
+        EstatusData status = new EstatusData();
         status.setText("El vendor recibe la orden");
         orden.setStatus(status);
         
@@ -19,7 +19,7 @@ public class VendedorService {
     public static void pagar(OrdenData orden) {
         // El vendor procesa el pago
         
-        StatusData status = new StatusData();
+        EstatusData status = new EstatusData();
         status.setText("El vendor procesa el pago");
         orden.setStatus(status);
         
@@ -33,7 +33,7 @@ public class VendedorService {
     public static void entregar(OrdenData orden) {
         // El vendedor recibe la orden de la cocina
         
-        StatusData status = new StatusData();
+        EstatusData status = new EstatusData();
         status.setText("El vendor recibe los cupcakes de la cocina");
         orden.setStatus(status);
         

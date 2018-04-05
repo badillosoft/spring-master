@@ -1,14 +1,14 @@
 package supercupcake.services;
 
 import supercupcake.data.OrdenData;
-import supercupcake.data.StatusData;
+import supercupcake.data.EstatusData;
 
 public class CocinaService {
     
     public static void pedir(OrdenData orden) {
         // La cocina recibe la orden para preparar los cupcakes
         
-        StatusData status = new StatusData();
+        EstatusData status = new EstatusData();
         status.setText("La cocina está preparando los cupcakes");
         orden.setStatus(status);
         

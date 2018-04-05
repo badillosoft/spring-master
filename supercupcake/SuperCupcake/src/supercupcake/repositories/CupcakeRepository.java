@@ -1,85 +1,60 @@
 package supercupcake.repositories;
 
-import supercupcake.data.ClienteData;
+import supercupcake.data.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ClienteRepository {
+public class CupcakeRepository {
     
-    public static void insertar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO clientes (nombre, correo) VALUES (?, ?);");
+    public static void insertar(CupcakeData cupcake) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO cupcakes (tipo, precio) VALUES (?, ?);");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
+        st.setString(1, cupcake.getTipo());
+        st.setDouble(2, cupcake.getPrecio());
         
         int id = DBManager.executeInsert(st);
         
-        cliente.setId(id);
+        cupcake.setId(id);
     }
     
-    public static void actualizar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE clientes SET nombre=?, correo=? WHERE id=?;");
+    public static void actualizar(CupcakeData cupcake) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("UPDATE cupcakes SET tipo=?, precio=? WHERE id=?;");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
-        st.setInt(3, cliente.getId());
+        st.setString(1, cupcake.getTipo());
+        st.setDouble(2, cupcake.getPrecio());
+        st.setInt(3, cupcake.getId());
         
         st.executeUpdate();
     }
     
-    public static void eliminar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("DELETE FROM clientes WHERE id=?;");
+    public static void eliminar(CupcakeData cupcake) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("DELETE FROM cupcakes WHERE id=?;");
         
-        st.setInt(1, cliente.getId());
+        st.setInt(1, cupcake.getId());
         
         st.executeUpdate();
     }
     
-    public static ClienteData buscarPorId(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE id=?;");
+    public static CupcakeData buscarPorId(int id) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM cupcakes WHERE id=?;");
         
         st.setInt(1, id);
         
         ResultSet rs = st.executeQuery();
         
-        ClienteData cliente = new ClienteData();
-        cliente.setId(id);
+        CupcakeData cupcake = new CupcakeData();
+        cupcake.setId(id);
         
         if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
+            String tipo = rs.getString("tipo");
+            double precio = rs.getDouble("precio");
             
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
+            cupcake.setTipo(tipo);
+            cupcake.setPrecio(precio);
+        } else {
+            return null;
         }
         
-        return cliente;
-    }
-    
-    public static List<ClienteData> buscarPorNombre(String like) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE nombre like ?;");
-        
-        st.setString(1, like);
-        
-        ResultSet rs = st.executeQuery();
-        
-        List<ClienteData> clientes = new ArrayList();
-        
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
-            
-            ClienteData cliente = new ClienteData();
-            cliente.setId(id);
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
-            
-            clientes.add(cliente);
-        }
-        
-        return clientes;
+        return cupcake;
     }
     
 }

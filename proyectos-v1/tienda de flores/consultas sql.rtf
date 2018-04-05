@@ -1,0 +1,176 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1561\cocoasubrtf200
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 # Tablas\
+1.\
+```sql\
+create table clientes(\
+id int primary key auto_increment,\
+nombre varchar(128) not null,\
+correo varchar (128) not null);\
+```\
+2.\
+create table vendedores(\
+id int primary key auto_increment,\
+nombre varchar(128) not null,\
+correo varchar (128) not null);\
+3.\
+create table expertos(\
+id int primary key auto_increment,\
+nombre varchar(128) not null,\
+correo varchar (256) not null);\
+\
+4.\
+create table status(\
+id int primary key auto_increment,\
+descripcion varchar(256) not null);\
+\
+5.\
+create table plantas(\
+id int primary key auto_increment,\
+tipo varchar(256) not null,\
+precio float);\
+6.\
+create table cobros(\
+id int primary key auto_increment,\
+total float,\
+token_paypal text,\
+completado tinyint(1) );\
+7.\
+create table pagos(\
+id int primary key auto_increment,\
+token_paypal text,\
+completado tinyint(1) );\
+8.\
+create table ordenes(\
+id int primary key auto_increment,\
+cliente int not null,\
+vendedor int not null,\
+experto int,\
+invernadero int,\
+cobro int,\
+pago int,\
+status int not null);\
+9.\
+create table orden_plantas(\
+id int primary key auto_increment,\
+orden int not null,\
+planta int not null,\
+multiplicador int not null);\
+10.\
+create table invernadero(\
+id int primary key auto_increment,\
+nombre varchar(128) not null,\
+direccion varchar (256) not null);\
+\
+---\
+Clientes\
+--\
+```sql\
+insert into clientes (nombre, correo) values ('gibran','gibran@gmail.com');\
+insert into clientes (nombre, correo) values ('fanny','fanny@gmail.com');\
+```\
+---\
+\
+vendedores\
+--\
+```sql\
+insert into vendedores (nombre, correo) values ('hector','hector@gmail.com');\
+insert into vendedores (nombre, correo) values ('ilse','ilse@gmail.com');\
+```\
+---\
+\
+Expertos\
+--\
+```sql\
+insert into expertos (nombre, correo) values ('wariko','wariko@gmail.com');\
+insert into expertos (nombre, correo) values ('warika','warika@gmail.com');\
+```\
+---\
+\
+Status\
+--\
+```sql\
+insert into status (descripcion) values ('el cliente hace la consulta');\
+insert into status (descripcion) values ('el experto envia el dise\'f1o');\
+insert into status (descripcion) values ('el cliente aprueba el dise\'f1o');\
+insert into status (descripcion) values ('el cliente elije el dise\'f1o');\
+insert into status (descripcion) values ('El cliente envia la orden al vendedor');\
+insert into status (descripcion) values ('el vendedor recibe la orden');\
+insert into status (descripcion) values ('el clientes acepta el cobro');\
+insert into status (descripcion) values ('el vendedor procesa el pago');\
+insert into status (descripcion) values ('el experto pide las cosas al invernadero');\
+insert into status (descripcion) values ('El invernadero acepta la orden');\
+insert into status (descripcion) values ('el experto recibe las flores');\
+insert into status (descripcion) values ('el cliente recibe su instalacion');\
+insert into status (descripcion) values ('La orden se cierra');\
+```\
+---\
+1. el cliente hace la consulta\
+```sql\
+insert into ordenes(cliente,experto,status) values(1,2,1);\
+```\
+\
+2. el experto envia el dise\'f1o\
+```sql\
+update ordenes set status=2 where id=1;\
+```\
+3. el cliente aprueba el dise\'f1o\
+```sql\
+update ordenes set status=3 where id=1;\
+```\
+4. el cliente elije el dise\'f1o\
+```sql\
+insert into orden_plantas (orden, planta, multiplicador) values (1, 2, 3);\
+insert into orden_plantas (orden, planta, multiplicador) values (1, 3, 5);\
+update ordenes set status=4 where id=1;\
+```\
+5. El cliente envia la orden al vendedor\
+```sql\
+update ordenes set status=5 where id=1;\
+```\
+6. el vendedor recibe la orden\
+```sql\
+update ordenes set status=6 where id=1;\
+```\
+7. el clientes acepta el cobro\
+```sql\
+insert into cobros (total, token_paypal, completado) values (\
+	(select sum(orden_plantas.multiplicador * plantas.precio) as total from orden_plantas left join plantas on orden_plantas.planta=plantas.id where orden_plantas.orden=1),\
+	'ABC123',\
+	1);\
+update ordenes set cobro=1 where id=1;\
+\
+update ordenes set status=7 where id=1;\
+```\
+8. el vendedor procesa el pago\
+```sql\
+insert into pagos (token_paypal, completado) values ('ABC123', 1);\
+\
+update ordenes set pago=1 where id=1;\
+\
+update ordenes set estatus=8 where id=1;\
+```\
+9. el experto pide las cosas al invernadero\
+\
+```sql\
+update ordenes set invernadero=(select id from invernadero order by rand() limit 1) where id=1;\
+\
+update ordenes set estatus=9 where id=1;\
+```\
+10. El invernadero acepta la orden\
+```sql\
+update ordenes set estatus=10 where id=1;\
+```\
+11. el experto recibe las flores\
+```sql\
+update ordenes set estatus=11 where id=1;\
+```\
+12. el cliente recibe su instalacion\
+```sql\
+update ordenes set estatus=12 where id=1;\
+```}

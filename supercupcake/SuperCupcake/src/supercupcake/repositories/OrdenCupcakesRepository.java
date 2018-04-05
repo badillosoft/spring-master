@@ -1,85 +1,67 @@
 package supercupcake.repositories;
 
-import supercupcake.data.ClienteData;
+import supercupcake.data.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ClienteRepository {
+public class OrdenCupcakesRepository {
     
-    public static void insertar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO clientes (nombre, correo) VALUES (?, ?);");
+    public static void insertar(OrdenCupcakesData orden_cupcakes) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO orden_cupcakes (orden, cupcake, multiplicador) VALUES (?, ?, ?);");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
+        st.setInt(1, orden_cupcakes.getOrden().getId());
+        st.setInt(2, orden_cupcakes.getCupcake().getId());
+        st.setInt(3, orden_cupcakes.getMultiplicador()); 
         
         int id = DBManager.executeInsert(st);
         
-        cliente.setId(id);
+        orden_cupcakes.setId(id);
     }
     
-    public static void actualizar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE clientes SET nombre=?, correo=? WHERE id=?;");
+    public static void actualizar(OrdenCupcakesData orden_cupcakes) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("UPDATE orden_cupcakes SET orden=?, cupcake=?, multiplicador=? WHERE id=?;");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
-        st.setInt(3, cliente.getId());
+        st.setInt(1, orden_cupcakes.getOrden().getId());
+        st.setInt(2, orden_cupcakes.getCupcake().getId());
+        st.setInt(3, orden_cupcakes.getMultiplicador());
+        st.setInt(4, orden_cupcakes.getId());
         
         st.executeUpdate();
     }
     
-    public static void eliminar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("DELETE FROM clientes WHERE id=?;");
+    public static void eliminar(OrdenCupcakesData orden_cupcakes) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("DELETE FROM orden_cupcakes WHERE id=?;");
         
-        st.setInt(1, cliente.getId());
+        st.setInt(1, orden_cupcakes.getId());
         
         st.executeUpdate();
     }
     
-    public static ClienteData buscarPorId(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE id=?;");
+    public static OrdenCupcakesData buscarPorId(int id) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM orden_cupcakes WHERE id=?;");
         
         st.setInt(1, id);
         
         ResultSet rs = st.executeQuery();
         
-        ClienteData cliente = new ClienteData();
-        cliente.setId(id);
+        OrdenCupcakesData orden_cupcakes = new OrdenCupcakesData();
+        orden_cupcakes.setId(id);
         
         if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
+            int id_orden = rs.getInt("orden");
+            int id_cupcake = rs.getInt("cupcake");
+            int multiplicador = rs.getInt("multiplicador");
             
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
+            //OrdenData orden = OrdenRepository.buscarPorId(id_orden);
+            CupcakeData cupcake = CupcakeRepository.buscarPorId(id_orden);
+            
+            //orden_cupcakes.setOrden(orden);
+            orden_cupcakes.setCupcake(cupcake);
+            orden_cupcakes.setMultiplicador(multiplicador);
+        } else {
+            return null;
         }
         
-        return cliente;
-    }
-    
-    public static List<ClienteData> buscarPorNombre(String like) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE nombre like ?;");
-        
-        st.setString(1, like);
-        
-        ResultSet rs = st.executeQuery();
-        
-        List<ClienteData> clientes = new ArrayList();
-        
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
-            
-            ClienteData cliente = new ClienteData();
-            cliente.setId(id);
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
-            
-            clientes.add(cliente);
-        }
-        
-        return clientes;
+        return orden_cupcakes;
     }
     
 }

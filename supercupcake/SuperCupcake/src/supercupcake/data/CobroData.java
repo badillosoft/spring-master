@@ -2,14 +2,41 @@ package supercupcake.data;
 
 public class CobroData {
     
-    boolean cobrado;
+    int id;
+    double total;
+    String token_paypal;
+    boolean completado;
 
-    public boolean isCobrado() {
-        return cobrado;
+    public int getId() {
+        return id;
     }
 
-    public void setCobrado(boolean cobrado) {
-        this.cobrado = cobrado;
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public String getToken_paypal() {
+        return token_paypal;
+    }
+
+    public void setToken_paypal(String token_paypal) {
+        this.token_paypal = token_paypal;
+    }
+
+    public boolean isCompletado() {
+        return completado;
+    }
+
+    public void setCompletado(boolean completado) {
+        this.completado = completado;
     }
     
 }

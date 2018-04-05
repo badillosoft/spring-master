@@ -52,6 +52,8 @@ public class ClienteRepository {
             
             cliente.setNombre(nombre);
             cliente.setCorreo(correo);
+        } else {
+            return null;
         }
         
         return cliente;

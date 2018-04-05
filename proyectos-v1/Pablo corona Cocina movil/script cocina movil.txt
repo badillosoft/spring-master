@@ -1,0 +1,92 @@
+create database super_cocina_movil;
+
+use super_cocina_movil;
+
+create table clientes (
+	id int primary key auto_increment,
+	nombre varchar(128) not null,
+	direccion varchar(255) not null
+	);
+
+create table registros (
+	id int primary key auto_increment,
+	cliente int not null,
+	fecha date
+	);
+
+create table cocinas_movil (
+	id int primary key auto_increment,
+	nombre varchar(128) not null,
+	registro int not null,
+	orden int not null
+	);
+
+create table estatus (
+	id int primary key auto_increment,
+	descripcion varchar(255) not null
+	);
+
+create table menus (
+	id int primary key auto_increment,
+	catalogo varchar(255) not null,
+	precio float
+	);
+
+create table orden_menus (
+	id int primary key auto_increment,
+	orden int not null,
+	menu int not null
+	);
+
+create table cobros (
+	id int primary key auto_increment,
+	total float,
+	token_paypal text,
+	completado tinyint (1)
+	);
+
+create table pagos (
+	id int primary key auto_increment,
+	token_paypal text,
+	completado tinyint (1)
+	);
+
+create table ordenes (
+	id int primary key auto_increment,
+	cliente int not null,
+	registro int not null,
+	cocina_movil int,
+	cobro int,
+	pago int,
+	estatus int not null 
+	);
+
+
+
+
+insert into clientes (nombre, direccion) values ('Pablo Corona', 'Ismael Ronderos 38, iztacalco, cdmx');
+
+insert into registros (cliente, fecha) values (1, '2018-04-22');
+
+insert into cocinas_movil (nombre, registro, orden) values ('Condesa', 1, 1);
+
+insert into estatus (descripcion) values ('');
+
+insert into menus (catalogo, precio) values ('Tacos al pastor', 1120);
+
+insert into orden_menus (orden, menu) values (1, 1);
+
+insert into cobros (total, token_paypal, completado) values (1120, 'ABC123', 1);
+
+insert into pagos (token_paypal, completado) values ('ABC123', 1);
+
+insert into ordenes (cliente, registro, cocina_movil, cobro, pago, estatus) values (1, 1, 1, 1, 1, 1);
+
+
+
+
+
+
+
+
+

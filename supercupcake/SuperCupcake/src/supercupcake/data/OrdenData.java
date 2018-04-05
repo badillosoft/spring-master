@@ -4,20 +4,20 @@ import java.util.List;
 
 public class OrdenData {
     
-    String id;
+    int id;
     ClienteData cliente;
     VendedorData vendedor;
     CocinaData cocina;
     List<CupcakeData> cupcakes;
-    StatusData status;
+    EstatusData estatus;
     CobroData cobro;
     PagoData pago;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -53,14 +53,14 @@ public class OrdenData {
         this.cupcakes = cupcakes;
     }
 
-    public StatusData getStatus() {
-        return status;
+    public EstatusData getEstatus() {
+        return estatus;
     }
 
-    public void setStatus(StatusData status) {
-        this.status = status;
+    public void setEstatus(EstatusData estatus) {
+        this.estatus = estatus;
     }
-
+    
     public CobroData getCobro() {
         return cobro;
     }

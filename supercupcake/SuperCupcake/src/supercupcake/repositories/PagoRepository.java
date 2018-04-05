@@ -1,85 +1,61 @@
 package supercupcake.repositories;
 
-import supercupcake.data.ClienteData;
+import supercupcake.data.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ClienteRepository {
+public class PagoRepository {
     
-    public static void insertar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO clientes (nombre, correo) VALUES (?, ?);");
+    public static void insertar(PagoData pago) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO pagos (token_paypal, completado) VALUES (?, ?);");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
+        st.setString(1, pago.getToken_paypal());
+        st.setBoolean(2, pago.isCompletado());
         
         int id = DBManager.executeInsert(st);
         
-        cliente.setId(id);
+        pago.setId(id);
     }
     
-    public static void actualizar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE clientes SET nombre=?, correo=? WHERE id=?;");
+    public static void actualizar(PagoData pago) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("UPDATE pagos SET token_paypal=?, completado=? WHERE id=?;");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
-        st.setInt(3, cliente.getId());
+        st.setString(1, pago.getToken_paypal());
+        st.setBoolean(2, pago.isCompletado());
+        st.setInt(3, pago.getId());
         
         st.executeUpdate();
     }
     
-    public static void eliminar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("DELETE FROM clientes WHERE id=?;");
+    public static void eliminar(PagoData pago) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("DELETE FROM pagos WHERE id=?;");
         
-        st.setInt(1, cliente.getId());
+        st.setInt(1, pago.getId());
         
         st.executeUpdate();
     }
     
-    public static ClienteData buscarPorId(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE id=?;");
+    public static PagoData buscarPorId(int id) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM pagos WHERE id=?;");
         
         st.setInt(1, id);
         
         ResultSet rs = st.executeQuery();
         
-        ClienteData cliente = new ClienteData();
-        cliente.setId(id);
+        PagoData pago = new PagoData();
+        pago.setId(id);
         
         if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
+            double total = rs.getDouble("total");
+            String token_paypal = rs.getString("token_paypal");
+            boolean completado = rs.getBoolean("completado");
             
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
+            pago.setToken_paypal(token_paypal);
+            pago.setCompletado(completado);
+        } else {
+            return null;
         }
         
-        return cliente;
-    }
-    
-    public static List<ClienteData> buscarPorNombre(String like) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE nombre like ?;");
-        
-        st.setString(1, like);
-        
-        ResultSet rs = st.executeQuery();
-        
-        List<ClienteData> clientes = new ArrayList();
-        
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
-            
-            ClienteData cliente = new ClienteData();
-            cliente.setId(id);
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
-            
-            clientes.add(cliente);
-        }
-        
-        return clientes;
+        return pago;
     }
     
 }

@@ -1,85 +1,79 @@
 package supercupcake.repositories;
 
-import supercupcake.data.ClienteData;
+import supercupcake.data.*;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class ClienteRepository {
+public class CobroRepository {
     
-    public static void insertar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("INSERT INTO clientes (nombre, correo) VALUES (?, ?);");
+    public static void insertar(CobroData cobro) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("INSERT INTO cobros (total, token_paypal, completado) VALUES (?, ?);");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
+        st.setDouble(1, cobro.getTotal());
+        st.setString(2, cobro.getToken_paypal());
+        st.setBoolean(3, cobro.isCompletado());
         
         int id = DBManager.executeInsert(st);
         
-        cliente.setId(id);
+        cobro.setId(id);
     }
     
-    public static void actualizar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("UPDATE clientes SET nombre=?, correo=? WHERE id=?;");
+    public static void actualizar(CobroData cobro, OrdenData orden) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("UPDATE cobros SET total=?, token_paypal=?, completado=? WHERE id=?;");
         
-        st.setString(1, cliente.getNombre());
-        st.setString(2, cliente.getCorreo());
-        st.setInt(3, cliente.getId());
+        st.setDouble(1, cobro.getTotal());
+        st.setString(2, cobro.getToken_paypal());
+        st.setBoolean(3, cobro.isCompletado());
+        st.setInt(4, cobro.getId());
         
         st.executeUpdate();
     }
     
-    public static void eliminar(ClienteData cliente) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("DELETE FROM clientes WHERE id=?;");
+    public static void eliminar(CobroData cobro) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("DELETE FROM cobros WHERE id=?;");
         
-        st.setInt(1, cliente.getId());
+        st.setInt(1, cobro.getId());
         
         st.executeUpdate();
     }
     
-    public static ClienteData buscarPorId(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE id=?;");
+    public static double calcularTotal(OrdenData orden) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("select sum(orden_cupcakes.multiplicador * cupcakes.precio) as total from orden_cupcakes left join cupcakes on orden_cupcakes.cupcake=cupcakes.id where orden_cupcakes.orden=?");
+        
+        st.setInt(1, orden.getId());
+        
+        ResultSet rs = st.executeQuery();
+        
+        if (rs.next()) {
+            double total = rs.getDouble("total");
+            return total;
+        }
+        
+        return -1;
+    }
+    
+    public static CobroData buscarPorId(int id) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM cobros WHERE id=?;");
         
         st.setInt(1, id);
         
         ResultSet rs = st.executeQuery();
         
-        ClienteData cliente = new ClienteData();
-        cliente.setId(id);
+        CobroData cobro = new CobroData();
+        cobro.setId(id);
         
         if (rs.next()) {
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
+            double total = rs.getDouble("total");
+            String token_paypal = rs.getString("token_paypal");
+            boolean completado = rs.getBoolean("completado");
             
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
+            cobro.setTotal(total);
+            cobro.setToken_paypal(token_paypal);
+            cobro.setCompletado(completado);
+        } else {
+            return null;
         }
         
-        return cliente;
-    }
-    
-    public static List<ClienteData> buscarPorNombre(String like) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("SELECT * FROM clientes WHERE nombre like ?;");
-        
-        st.setString(1, like);
-        
-        ResultSet rs = st.executeQuery();
-        
-        List<ClienteData> clientes = new ArrayList();
-        
-        while (rs.next()) {
-            int id = rs.getInt("id");
-            String nombre = rs.getString("nombre");
-            String correo = rs.getString("correo");
-            
-            ClienteData cliente = new ClienteData();
-            cliente.setId(id);
-            cliente.setNombre(nombre);
-            cliente.setCorreo(correo);
-            
-            clientes.add(cliente);
-        }
-        
-        return clientes;
+        return cobro;
     }
     
 }
