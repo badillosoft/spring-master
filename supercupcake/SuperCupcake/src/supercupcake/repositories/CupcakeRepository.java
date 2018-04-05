@@ -57,4 +57,26 @@ public class CupcakeRepository {
         return cupcake;
     }
     
+    public static CupcakeData buscarAleatorio() throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM cupcakes ORDER BY RAND() LIMIT 1;");
+        
+        ResultSet rs = st.executeQuery();
+        
+        CupcakeData cupcake = new CupcakeData();
+        
+        if (rs.next()) {
+            int id = rs.getInt("id");
+            String tipo = rs.getString("tipo");
+            double precio = rs.getDouble("precio");
+            
+            cupcake.setId(id);
+            cupcake.setTipo(tipo);
+            cupcake.setPrecio(precio);
+        } else {
+            return null;
+        }
+        
+        return cupcake;
+    }
+    
 }

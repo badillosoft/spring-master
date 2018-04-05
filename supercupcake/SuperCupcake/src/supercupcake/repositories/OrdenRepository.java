@@ -2,6 +2,7 @@ package supercupcake.repositories;
 
 import supercupcake.data.*;
 import java.sql.*;
+import java.util.*;
 
 public class OrdenRepository {
     
@@ -15,6 +16,30 @@ public class OrdenRepository {
         int id = DBManager.executeInsert(st);
         
         orden.setId(id);
+    }
+    
+    public static void insertarListaCupcakes(OrdenData orden) throws SQLException {
+        Map<Integer, Integer> cupcake_table = new HashMap();
+        
+        for (CupcakeData cupcake : orden.getCupcakes()) {
+            if (cupcake_table.containsKey(cupcake.getId())) {
+                int multiplicador = cupcake_table.get(cupcake.getId());
+                cupcake_table.put(cupcake.getId(), multiplicador + 1);
+                continue;
+            }
+            cupcake_table.put(cupcake.getId(), 1);
+        }
+        
+        for (int id_cupcake : cupcake_table.keySet()) {
+            int multiplicador = cupcake_table.get(id_cupcake);
+            OrdenCupcakesData orden_cupcakes = new OrdenCupcakesData();
+            orden_cupcakes.setOrden(orden);
+            CupcakeData cupcake = new CupcakeData();
+            cupcake.setId(id_cupcake);
+            orden_cupcakes.setCupcake(cupcake);
+            orden_cupcakes.setMultiplicador(multiplicador);
+            OrdenCupcakesRepository.insertar(orden_cupcakes);
+        }
     }
     
     public static void actualizar(OrdenData orden) throws SQLException {
@@ -51,8 +76,31 @@ public class OrdenRepository {
         st.executeUpdate();
     }
     
+    public static void cargarLista(OrdenData orden) throws SQLException {
+        PreparedStatement st = DBManager.generateQuery("SELECT * FROM orden_cupcakes WHERE orden=?");
+        
+        st.setInt(1, orden.getId());
+        
+        ResultSet rs = st.executeQuery();
+        
+        List<CupcakeData> cupcakes = new ArrayList();
+        
+        while (rs.next()) {
+            int id_cupcake = rs.getInt("cupcake");
+            int multiplicador = rs.getInt("multiplicador");
+            
+            CupcakeData cupcake = CupcakeRepository.buscarPorId(id_cupcake);
+            
+            for (int i = 0; i < multiplicador; i++) {
+                cupcakes.add(cupcake);
+            }
+        }
+        
+        orden.setCupcakes(cupcakes);
+    }
+    
     public static double calcularTotal(int id) throws SQLException {
-        PreparedStatement st = DBManager.generateQuery("select sum(A.multiplicador * B.precio) as total from orden_cupcakes as A left join cupcakes as B on A.cupcake=B.id where A.orden=?;");
+        PreparedStatement st = DBManager.generateQuery("SELECT SUM(A.multiplicador * B.precio) AS total FROM orden_cupcakes AS A LEFT JOIN cupcakes AS B ON A.cupcake=B.id WHERE A.orden=?;");
         
         st.setInt(1, id);
         

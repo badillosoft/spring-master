@@ -45,7 +45,6 @@ public class PagoRepository {
         pago.setId(id);
         
         if (rs.next()) {
-            double total = rs.getDouble("total");
             String token_paypal = rs.getString("token_paypal");
             boolean completado = rs.getBoolean("completado");
             

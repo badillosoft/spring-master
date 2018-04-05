@@ -17,11 +17,11 @@ public class VendedorService {
         EstatusData estatus = EstatusRepository.buscarPorId(3);
         orden.setEstatus(estatus);
         
-        // 3. Tomar la lista de cupcakes y guardar en OrdenCupcakesRepository
-        //OrdenRepository.insertarListaCupcakes(orden);
-        
         // 4. Actualizar la base de datos
         OrdenRepository.insertar(orden);
+        
+        // 3. Tomar la lista de cupcakes y guardar en OrdenCupcakesRepository
+        OrdenRepository.insertarListaCupcakes(orden);
     }
     
     public static void pagar(OrdenData orden) throws SQLException {
