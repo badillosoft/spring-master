@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<context:annotation-config></context:annotation-config>
+
+	<bean id="cliente" class="com.naat.beans.ClienteBean">
+		<property name="id" value="5"></property>
+		<property name="nombre" value="John Doe"></property>
+	</bean>
+
+	<bean id="direccion" class="com.naat.beans.DireccionBean">
+		<property name="calle" value="Av Simpre Viva 123"></property>
+		<property name="colonia" value="Condesa"></property>
+	</bean>
+
+</beans>

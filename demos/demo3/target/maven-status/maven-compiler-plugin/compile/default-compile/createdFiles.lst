@@ -1,0 +1,4 @@
+com/naat/beans/ClienteBean.class
+com/naat/services/ClienteService.class
+com/naat/demo3/App.class
+com/naat/repositories/ClienteRepository.class
