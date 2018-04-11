@@ -1,6 +1,6 @@
 package com.badillosoft.beans;
 
-public class ClienteBean {
+public class VendedorBean {
 
 	Integer id;
     String nombre;

@@ -1,11 +1,11 @@
 package com.badillosoft.beans;
 
-public class ClienteBean {
+public class CocinaBean {
 
 	Integer id;
     String nombre;
-    String correo;
-    
+    String direccion;
+
     public Integer getId() {
         return id;
     }
@@ -22,12 +22,12 @@ public class ClienteBean {
         this.nombre = nombre;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getDireccion() {
+        return direccion;
     }
 
-    public void setCorreo(String correo) {
-        this.correo = correo;
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
     }
-	
+    
 }
