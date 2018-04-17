@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -59,7 +59,7 @@ public class OrdenApi {
 		return ordenService.asignarCliente(ordenOpt.get(), clienteOpt.get());
 	}
 	
-	@RequestMapping("/{id}/agregar/cupcake")
+	@RequestMapping(value="/{id}/agregar/cupcake", method=RequestMethod.POST)
 	@ResponseBody
 	public Orden agregarCupcake(@PathVariable("id") Long idOrden, @RequestParam(name="id") Long idCupcake) {
 		Optional<Orden> ordenOpt = ordenDao.findById(idOrden);
@@ -85,8 +85,8 @@ public class OrdenApi {
 	
 	@RequestMapping("/{id}/cupcakes")
 	@ResponseBody
-	public List<Cupcake> obtenerCupcakes(@PathVariable("id") Long idOrden) {
-		return ordenDao.findById(idOrden).get().getCupcakes();
+	public List<Cupcake> obtenerCupcakes(@PathVariable("id") Long idOrden, @RequestParam(name="precioMayor", defaultValue="0.0") Double precioMayor) {
+		return ordenDao.obtenerCupcakes(idOrden, precioMayor);
 	}
 	
 }

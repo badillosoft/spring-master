@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+
+	<div>
+		<input name="correo" id="correo" type="email" placeholder="Escribe tu correo">
+		<input name="clave" id="clave" type="password" placeholder="Escribe tu contraseña">
+		<input type="button" onclick="acceder()" value="iniciar sesión">
+	</div>
+	
+	<div>
+		<button onclick="obtenerCupcakes()">Obtener Cupcakes</button>
+	</div>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<script>
+		function acceder() {
+			$.ajax({
+				url: "/cliente/acceder",
+				data: {
+					correo: document.getElementById("correo").value,
+					clave: document.getElementById("clave").value,
+				},
+				//dataType: "JSON",
+				method: "POST",
+				success: function (result) {
+					console.log(result);
+					sessionStorage.setItem("token", result);
+				},
+				error: function (err) {
+					console.error(err);
+				}
+			});
+		}
+		
+		function obtenerCupcakes() {
+			const token = sessionStorage.getItem("token");
+			$.ajax({
+				url: "/cliente/3/ordenes",
+				data: {
+					token: token
+				},
+				dataType: "JSON",
+				method: "POST",
+				success: function (result) {
+					console.log(result);
+				},
+				error: function (err) {
+					console.error(err);
+				}
+			});
+		}
+	</script>
+
+</body>
+</html>

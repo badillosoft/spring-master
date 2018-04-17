@@ -7,9 +7,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToOne;
 
 @Entity
+@NamedNativeQuery(name = "Orden.obtenerCupcakes",
+	query="SELECT B.* FROM orden_cupcakes A INNER JOIN cupcake B ON A.cupcakes_id=B.id WHERE A.orden_id=:id AND B.precio > :precioMayor",
+	resultClass=Cupcake.class)
 public class Orden {
 
 	@Id
