@@ -422,7 +422,304 @@ public interface ClienteController {
 
 ## 3. Seguridad
 
-En construcción...
+Para proveer una capa de seguridad, sería conveniente estructurar una entidad independiente a los usuarios donde se especifiquen las credenciales del usuario, por ejemplo, el *email*, el *password*, el *rol*, el *token*, la fecha de expiración del *token*, algunos servicios para determinar si el *token* es válido, validar que el token entre dentro de cierta operación, etc.
+
+Lo primero será establecer la entidad *Credential* que representa la credencial con la que el usuario accede al sistema, esto independiente si el usuario ya definió campos para su correo u otros datos. La entidad credencial debería verse como la siguiente:
+
+~~~java
+package com.example.security;
+
+// ... imports
+
+@Entity
+public class Credential {
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    Long id;
+
+    @NotNull
+    String email;
+
+    @NotNull
+    @JsonIgnore
+    String password;
+
+    @NotNull
+    String role;
+
+    @NotNull
+    String token;
+
+    @NotNull
+    Timestamp lastLogin;
+
+    @NotNull
+    Timestamp lastUpdate;
+
+    @NotNull
+    Boolean login;
+
+	@NotNull
+    String device;
+
+    // ... getters y setters
+
+}
+~~~
+
+Observa que todo lo referente a seguridad será separado en un paquete independiente mezclando, entidades, repositorios y servicios. También analiza el uso de esta entidad, la cuál servirá para autenticar al usuario, usaremos el campo `lastLogin` para saber cuando fue la última vez que ingreso sus credenciales y `lastUpdate` nos dirá cuando fue la ultima vez que actualizó sus credenciales (sólo el token). Si necesitaramos que los token expiren, entonces deberemos adicionar un campo `Timestamp expire`. El campo `login` nos dirá si el usuario tiene una sesión activa y el campo `device` podrá almacenar una cadena con el identificador de la máquina, por ejemplo, para advertirle al usuario que ha intentado inicar sesión desde otro dispositivo, en un sistema más avanzado podríamos hacer una relación `@OneToMany` sobre este campo, ya que el usuario podría iniciar sesión sus dispositivos de confianza. En esta metodología no se implementa el inicio de sesión en dos pasos.
+
+Los siguiente es exponer un repositorio con la funcionalidad para saber si el usuario tiene una sesión activa, si el usuario inicia sesión después de cierto tiempo inactivo.
+
+~~~java
+package com.example.security;
+
+// ... imports
+
+@Transactional
+public interface CredentialRepository extends CrudRepository<Credential, Long> {
+
+    @Query(value="select replace(uuid(),'-','')", nativeQuery=true)
+    public String randomToken();
+
+    @Query(value="select * from credential where email=:email and password=:password limit 1", nativeQuery=true)
+    public Optional<Credential> checkCredential(@Param("email") String email, @Param("password") String password);
+
+    @Query(value="select * from credential where email=:email and password=:password and role=:role limit 1", nativeQuery=true)
+    public Optional<Credential> checkCredentialAndRole(@Param("email") String email, @Param("password") String password, @Param("role") String role);
+
+    @Modifying
+    @Query(value="update credential set last_login=now(), last_update=now(), login=1, token=replace(uuid(),'-','') where email=:email", nativeQuery=true)
+    public void doLogin(@Param("email") String email);
+
+    @Modifying
+    @Query(value="update credential set login=0, token=replace(uuid(),'-','') where email=:email", nativeQuery=true)
+    public void doLogout(@Param("email") String email);
+
+    @Query(value="select * from credential where email=:email and token=:token limit 1", nativeQuery=true)
+    public Optional<Credential> checkToken(@Param("email") String email, @Param("token") String token);
+
+    @Query(value="select * from credential where email=:email and token=:token and time_to_sec(timediff(now(), last_update))<=:seconds limit 1", nativeQuery=true)
+    public Optional<Credential> checkTokenWithExpiration(@Param("email") String email, @Param("token") String token, @Param("seconds") Long seconds);
+
+    @Query(value="select * from credential where email=:email and token=:token and device=:device limit 1", nativeQuery=true)
+    public Optional<Credential> checkTokenWithDevice(@Param("email") String email, @Param("token") String token, @Param("device") String device);
+
+    @Query(value="select * from credential where email=:email and token=:token and device=:device and time_to_sec(timediff(now(), last_update))<=:seconds limit 1", nativeQuery=true)
+    public Optional<Credential> checkTokenWithDeviceAndExpiration(@Param("email") String email, @Param("token") String token, @Param("device") String device, @Param("seconds") Long seconds);
+
+}
+~~~
+
+Luego preoveeremos los servicios de seguridad para ingresar al sistema, salir del sistema o validar un usuario y rol.
+
+~~~java
+package com.example.security;
+
+// ... imports
+
+@Service
+public class CredentialService {
+
+    // ... autowireds
+
+    final Long EXPIRATION_TIME = 24l * 60l * 60l;
+
+    public Credential createCredential(Credential credential) {
+    	Timestamp date = Timestamp.valueOf(LocalDateTime.now());
+    	
+    	credential.setLastLogin(date);
+    	credential.setLastUpdate(date);
+    	credential.setToken(credentialRepository.randomToken());
+    	credential.setLogin(true);
+    	
+        credentialRepository.save(credential);
+
+        return credential;
+    }
+
+    public Credential doLogin(Credential credential) {
+        Optional<Credential> authenticOptional = credentialRepository.checkCredentialAndRole(credential.getEmail(), credential.getPassword(), credential.getRole());
+
+        if (!authenticOptional.isPresent()) {
+            return null;
+        }
+
+        Credential authentic = authenticOptional.get();
+
+        Timestamp date = Timestamp.valueOf(LocalDateTime.now());
+        
+        authentic.setLastLogin(date);
+        authentic.setLastUpdate(date);
+    	authentic.setToken(credentialRepository.randomToken());
+    	authentic.setLogin(true);
+    	authentic.setDevice(credential.getDevice());
+
+        credentialRepository.save(authentic);
+
+        return authentic;
+    }
+
+    public Credential refreshToken(Credential credential) {
+        Optional<Credential> authenticOptional = credentialRepository.checkTokenWithDeviceAndExpiration(credential.getEmail(), credential.getToken(), credential.getDevice(), EXPIRATION_TIME);
+
+        if (!authenticOptional.isPresent()) {
+            return null;
+        }
+
+        Credential authentic = authenticOptional.get();
+
+        Timestamp date = Timestamp.valueOf(LocalDateTime.now());
+        
+        authentic.setLastUpdate(date);
+    	authentic.setToken(credentialRepository.randomToken());
+    	authentic.setLogin(true);
+
+        credentialRepository.save(authentic);
+
+        return authentic;
+    }
+
+    public Credential getCredential(Credential credential) {
+        Optional<Credential> authenticOptional = credentialRepository.checkTokenWithDeviceAndExpiration(credential.getEmail(), credential.getToken(), credential.getDevice(), EXPIRATION_TIME);
+
+        if (!authenticOptional.isPresent()) {
+            return null;
+        }
+
+        Credential authentic = authenticOptional.get();
+
+        return authentic;
+    }
+
+    public Credential doLogout(Credential credential) {
+        Optional<Credential> authenticOptional = credentialRepository.checkTokenWithDeviceAndExpiration(credential.getEmail(), credential.getToken(), credential.getDevice(), EXPIRATION_TIME);
+
+        if (!authenticOptional.isPresent()) {
+            return null;
+        }
+
+        Credential authentic = authenticOptional.get();
+        
+    	authentic.setToken(credentialRepository.randomToken());
+    	authentic.setLogin(false);
+
+        credentialRepository.save(authentic);
+
+        return authentic;
+    }
+
+}
+~~~
+
+Ahora vamos a proveer el `api` de seguridad que nos permitirá realizar autenticaciones.
+
+~~~java
+package com.example.security;
+
+// ... imports
+
+@RestController
+@RequestMapping("/api/auth")
+public class CredentialApi {
+
+    // ... autowireds
+
+    @PostMapping("/login")
+    @ResponseBody
+    public Credential doLogin(@RequestParam String email, @RequestParam String password, @RequestParam(defaultValue="EMPTY-DEVICE") String device, @RequestParam(defaultValue="EMPTY-ROLE") String role, HttpServletResponse response) throws IOException {
+        Credential credential = new Credential();
+        credential.setEmail(email);
+        credential.setPassword(password);
+        credential.setDevice(device);
+        credential.setRole(role);
+
+        Credential authentic = credentialService.doLogin(credential);
+
+        if (authentic == null) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Unathorized");
+            return null;
+        }
+
+        return authentic;
+    }
+
+    @GetMapping("/logout")
+    @ResponseBody
+    public Credential doLogout(@RequestParam String email, @RequestParam String token, @RequestParam(defaultValue="EMPTY-DEVICE") String device, HttpServletResponse response) throws IOException {
+        Credential credential = new Credential();
+        credential.setEmail(email);
+        credential.setToken(token);
+        credential.setDevice(device);
+
+        Credential authentic = credentialService.doLogout(credential);
+
+        if (authentic == null) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Unathorized");
+            return null;
+        }
+
+        return authentic;
+    }
+
+    @GetMapping("/token")
+    @ResponseBody
+    public Credential refreshToken(@RequestParam String email, @RequestParam String token, @RequestParam(defaultValue="EMPTY-DEVICE") String device, HttpServletResponse response) throws IOException {
+        Credential credential = new Credential();
+        credential.setEmail(email);
+        credential.setToken(token);
+        credential.setDevice(device);
+
+        Credential authentic = credentialService.refreshToken(credential);
+
+        if (authentic == null) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Token has been expired or revoked");
+            return null;
+        }
+
+        return authentic;
+    }
+
+    @PutMapping("")
+    @ResponseBody
+    public Credential createCredential(@RequestParam String email, @RequestParam String password, @RequestParam(defaultValue="EMPTY-DEVICE") String device, @RequestParam(defaultValue="EMPTY-ROLE") String role, HttpServletResponse response) throws IOException {
+        Credential credential = new Credential();
+        credential.setEmail(email);
+        credential.setPassword(password);
+        credential.setDevice(device);
+        credential.setRole(role);
+
+        Credential authentic = credentialService.createCredential(credential);
+
+        if (authentic == null) {
+            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Error creating credential");
+            return null;
+        }
+
+        return authentic;
+    }
+
+    @GetMapping("")
+    @ResponseBody
+    public Credential getCredential(@RequestParam String email, @RequestParam String token, @RequestParam(defaultValue="EMPTY-DEVICE") String device, HttpServletResponse response) throws IOException {
+        Credential credential = new Credential();
+        credential.setEmail(email);
+        credential.setToken(token);
+        credential.setDevice(device);
+
+        Credential authentic = credentialService.getCredential(credential);
+
+        if (authentic == null) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Token has been expired or revoked");
+            return null;
+        }
+
+        return authentic;
+    }
+
+}
+~~~
 
 ## 4. Despliegue en Heroku
 
