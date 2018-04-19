@@ -1,6 +1,8 @@
 package com.badillosoft.services;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 
@@ -8,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.badillosoft.dao.ClienteDao;
+import com.badillosoft.dao.TelefonoDao;
 import com.badillosoft.dto.Cliente;
+import com.badillosoft.dto.Telefono;
 import com.badillosoft.dto.Token;
 
 @Service
@@ -16,6 +20,9 @@ public class ClienteService {
 
 	@Autowired
 	ClienteDao clienteDao;
+
+	@Autowired
+	TelefonoDao telefonoDao;
 	
 	@Autowired
 	TokenService tokenService;
@@ -25,9 +32,21 @@ public class ClienteService {
 		cliente.setNombre(nombre);
 		cliente.setCorreo(correo);
 		
+		//Set<Telefono> telefonos = new HashSet<>();
+		
+		//cliente.setTelefonos(telefonos);
+		
 		clienteDao.save(cliente);
 		
-		return cliente;
+		Telefono telefono = new Telefono();
+		telefono.setCliente(cliente);
+		telefono.setNumero("5512345678");
+		
+		telefonoDao.save(telefono);
+		
+		//telefonos.add(telefono);
+		
+		return clienteDao.findById(cliente.getId()).get();
 	}
 	
 	public Boolean validarToken(Long idCliente, String token) {

@@ -1,13 +1,22 @@
 package com.badillosoft.dto;
 
+import java.io.Serializable;
+import java.util.Set;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Cliente {
 	
 	@Id
@@ -23,6 +32,9 @@ public class Cliente {
 	
 	@OneToOne
 	Token token;
+	
+	@OneToMany(mappedBy="cliente")
+	Set<Telefono> telefonos;
 
 	public Long getId() {
 		return id;
@@ -62,6 +74,14 @@ public class Cliente {
 
 	public void setToken(Token token) {
 		this.token = token;
+	}
+
+	public Set<Telefono> getTelefonos() {
+		return telefonos;
+	}
+
+	public void setTelefonos(Set<Telefono> telefonos) {
+		this.telefonos = telefonos;
 	}
 	
 }

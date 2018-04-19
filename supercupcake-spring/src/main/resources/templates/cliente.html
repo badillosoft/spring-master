@@ -5,6 +5,13 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h1 th:text="${titulo}"></h1>
+	<ul style="list-style-type:none">
+		<li th:each="orden: ${ordenes}" style="margin:20px; padding: 10px; box-shadow:2px 2px 4px 4px rgba(0, 0, 0, 0.3)">
+			Orden Id: <span th:text="${orden?.id}"></span><br>
+			Cliente Id: <span th:text="${orden.cliente?.id ?: 'NO ASIGNADO'}"></span><br>
+			Cliente Correo: <span th:text="${orden.cliente?.correo ?: 'NO ASIGNADO'}"></span><br>
+			Cliente Nombre: <span th:text="${orden.cliente?.nombre ?: 'NO ASIGNADO'}"></span><br>
+		</li>
+	</ul>
 </body>
 </html>

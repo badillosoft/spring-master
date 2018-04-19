@@ -1,11 +1,15 @@
 package com.badillosoft.api;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.badillosoft.dao.ClienteDao;
 import com.badillosoft.dao.OrdenDao;
+import com.badillosoft.dao.TelefonoDao;
 import com.badillosoft.dao.TokenDao;
 import com.badillosoft.dto.Cliente;
 import com.badillosoft.dto.Orden;
+import com.badillosoft.dto.Telefono;
 import com.badillosoft.services.ClienteService;
 
 @RestController
@@ -33,11 +39,33 @@ public class ClienteApi {
 	ClienteDao clienteDao;
 	
 	@Autowired
+	TelefonoDao telefonoDao;
+	
+	@Autowired
 	OrdenDao ordenDao;
 
 	@Autowired
 	TokenDao tokenDao;
 
+	@RequestMapping(value="/telefono/{id}")
+	@ResponseBody
+	public Telefono verCliente(@PathVariable Long id, HttpServletResponse response) throws IOException {
+		Optional<Telefono> telefonoOpt = telefonoDao.findById(id);
+		
+		if (!telefonoOpt.isPresent()) {
+			response.sendError(HttpStatus.BAD_REQUEST.value(), "No existe el teléfono");
+			return null;
+		}
+		
+		return telefonoOpt.get();
+	}
+	
+	@RequestMapping(value="/{id}")
+	@ResponseBody
+	public Optional<Cliente> verTelefono(@PathVariable Long id) {
+		return clienteDao.findById(id);
+	}
+	
 	@RequestMapping(value="/crear")
 	@ResponseBody
 	public Cliente crearOrden(@RequestParam String nombre, @RequestParam String correo) {
