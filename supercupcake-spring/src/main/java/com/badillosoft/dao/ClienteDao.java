@@ -15,4 +15,6 @@ public interface ClienteDao extends CrudRepository<Cliente, Long> {
 	@Query(value="select * from cliente where correo=:correo and clave=:clave limit 1", nativeQuery=true)
 	public Optional<Cliente> buscarPorCorreoClave(@Param("correo") String correo, @Param("clave") String clave);
 	
+	public Optional<Cliente> findByCorreo(String correo);
+	
 }

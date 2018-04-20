@@ -46,6 +46,12 @@ public class ClienteApi {
 
 	@Autowired
 	TokenDao tokenDao;
+	
+	public void cors(HttpServletResponse response) {
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Content-Range, Content-Disposition, Content-Description");
+	}
 
 	@RequestMapping(value="/telefono/{id}")
 	@ResponseBody
@@ -64,6 +70,20 @@ public class ClienteApi {
 	@ResponseBody
 	public Optional<Cliente> verTelefono(@PathVariable Long id) {
 		return clienteDao.findById(id);
+	}
+	
+	@RequestMapping(value="/buscarPorCorreo")
+	@ResponseBody
+	public Cliente buscarPorCorreo(@RequestParam String correo,
+			HttpServletResponse response) {
+		cors(response);
+		Optional<Cliente> clienteOptional = clienteDao.findByCorreo(correo);
+		
+		if (!clienteOptional.isPresent()) {
+			return null;
+		}
+		
+		return clienteOptional.get();
 	}
 	
 	@RequestMapping(value="/crear")

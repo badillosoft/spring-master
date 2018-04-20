@@ -3,6 +3,8 @@ package com.badillosoft.api;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,15 +37,37 @@ public class OrdenApi {
 	@Autowired
 	CupcakeDao cupcakeDao;
 	
+	public void cors(HttpServletResponse response) {
+		response.addHeader("Access-Control-Allow-Origin", "*");
+		response.addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+		response.addHeader("Access-Control-Allow-Headers", "Content-Type, Content-Range, Content-Disposition, Content-Description");
+	}
+	
 	@RequestMapping("/crear")
 	@ResponseBody
-	public Orden crearOrden() {
+	public Orden crearOrden(HttpServletResponse response) {
+		cors(response);
+		
 		return ordenService.crearOrden();
+	}
+	
+	@RequestMapping("")
+	@ResponseBody
+	public Iterable<Orden> verOrdenes(HttpServletResponse response) {
+		cors(response);
+		
+		Iterable<Orden> ordenes = ordenDao.findAll();
+		
+		return ordenes;
 	}
 	
 	@RequestMapping("/{id}/asignar/cliente")
 	@ResponseBody
-	public Orden asignarCliente(@PathVariable("id") Long idOrden, @RequestParam(name="id") Long idCliente) {
+	public Orden asignarCliente(@PathVariable("id") Long idOrden, 
+			@RequestParam(name="id") Long idCliente,
+			HttpServletResponse response) {
+		cors(response);
+		
 		Optional<Orden> ordenOpt = ordenDao.findById(idOrden);
 		
 		if (!ordenOpt.isPresent()) {

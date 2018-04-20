@@ -13,10 +13,11 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
-@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+//@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
 public class Cliente {
 	
 	@Id
@@ -34,6 +35,7 @@ public class Cliente {
 	Token token;
 	
 	@OneToMany(mappedBy="cliente")
+	@JsonIgnore
 	Set<Telefono> telefonos;
 
 	public Long getId() {
